@@ -133,14 +133,14 @@ def healthz():
 @app.route("/readyz")
 def readyz():
 	elapsed_time = time.time() - start_time
-	if 30 < elapsed_time < 60:
-		return jsonify(error="Failure"), 500
-	else:
-		try:
-			client.admin.command('ping')
-			return "OK", 200
-		except ConnectionFailure:
-			return jsonify(error="MongoDB unavailable"), 503
+	# if 30 < elapsed_time < 60:
+	# 	return jsonify(error="Failure"), 500
+	# else:
+	try:
+		client.admin.command('ping')
+		return "OK", 200
+	except ConnectionFailure:
+		return jsonify(error="MongoDB unavailable"), 503
 
 if __name__ == "__main__":
 	env = os.environ.get('FLASK_ENV', 'production')
