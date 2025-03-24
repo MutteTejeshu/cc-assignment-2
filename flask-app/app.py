@@ -1,10 +1,12 @@
-from flask import Flask, render_template,request,redirect,url_for # For flask implementation
+from flask import Flask, render_template,request,redirect,url_for,jsonify # For flask implementation
 from pymongo import MongoClient # Database connector
+from pymongo.errors import ConnectionFailure
 from bson.objectid import ObjectId # For ObjectId to work
 from bson.errors import InvalidId # For catching InvalidId exception for ObjectId
 import os
+import time
 
-mongodb_host = os.environ.get('MONGO_HOST', 'localhost')
+mongodb_host = os.environ.get('MONGO_HOST', 'mongo')
 mongodb_port = int(os.environ.get('MONGO_PORT', '27017'))
 client = MongoClient(mongodb_host, mongodb_port)    #Configure the connection to the database
 db = client.camp2016    #Select the database
@@ -119,10 +121,30 @@ def search():
 def about():
 	return render_template('credits.html',t=title,h=heading)
 
+start_time = time.time()
+@app.route("/healthz")
+def healthz():
+	# elapsed_time = time.time() - start_time
+	# if 30 < elapsed_time < 60:
+	# 	return jsonify(error="Failure"), 500
+	# else:
+		return "OK", 200
+
+@app.route("/readyz")
+def readyz():
+	elapsed_time = time.time() - start_time
+	if 30 < elapsed_time < 60:
+		return jsonify(error="Failure"), 500
+	else:
+		try:
+			client.admin.command('ping')
+			return "OK", 200
+		except ConnectionFailure:
+			return jsonify(error="MongoDB unavailable"), 503
+
 if __name__ == "__main__":
-	env = os.environ.get('FLASK_ENV', 'development')
+	env = os.environ.get('FLASK_ENV', 'production')
 	port = int(os.environ.get('PORT', 5000))
 	debug = False if env == 'production' else True
-	app.run(debug=True)
-	app.run(port=port, debug=debug)
+	app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
 	# Careful with the debug mode..

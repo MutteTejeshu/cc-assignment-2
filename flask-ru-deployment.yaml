@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app-ru-deployment
+  labels:
+    app: flask-app-ru
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: flask-app-ru
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: flask-app-ru
+    spec:
+      containers:
+        - name: flask-app-ru
+          image: tejeshunyu/flask-todo-app:v1
+          ports:
+            - containerPort: 5000
+          imagePullPolicy: Always
+          env:
+            - name: MONGO_HOST
+              value: "mongo"
+            - name: MONGO_PORT
+              value: "27017"
+            - name: FLASK_ENV
+              value: "production"
+            - name: PORT
+              value: "5000"

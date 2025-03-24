@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-app-hm-service
+spec:
+  selector:
+    app: flask-app-hm
+  ports:
+    - port: 80
+      targetPort: 5000
+  type: LoadBalancer

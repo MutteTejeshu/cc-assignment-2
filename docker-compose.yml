@@ -1,18 +1,18 @@
 services:
   web:
-    build: .
+    image: tejeshunyu/flask-todo-app:v1
     ports:
       - "5001:5000"
     volumes:
       - ./flask-app:/app
     depends_on:
-      - mongo-service
+      - mongo
     environment:
       - FLASK_ENV=development
-      - MONGO_URI=mongodb://mongo-service:27017/todo
+      - MONGO_URI=mongodb://mongo:27017/todo
     restart: always
   
-  mongo-service:
+  mongo:
     image: mongo:latest
     ports:
       - "27017:27017"
